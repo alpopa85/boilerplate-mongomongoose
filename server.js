@@ -105,14 +105,14 @@ router.get("/create-and-save-person", function (req, res, next) {
         return next(err);
       }
       res.json(pers);
-      pers.remove();
+      pers.removeOne();
     });
   });
 });
 
 const createPeople = require("./myApp.js").createManyPeople;
 router.post("/create-many-people", function (req, res, next) {
-  Person.deleteOne({}, function (err) {
+  Person.deleteMany({}, function (err) {
     if (err) {
       return next(err);
     }
@@ -134,7 +134,7 @@ router.post("/create-many-people", function (req, res, next) {
           return next(err);
         }
         res.json(pers);
-        Person.deleteOne().exec();
+        // Person.deleteMany().exec();
       });
     });
   });
@@ -159,7 +159,7 @@ router.post("/find-all-by-name", function (req, res, next) {
         return next({ message: "Missing callback argument" });
       }
       res.json(data);
-      Person.remove().exec();
+      Person.deleteOne().exec();
     });
   });
 });
@@ -235,7 +235,7 @@ router.post("/find-edit-save", function (req, res, next) {
           return next({ message: "Missing callback argument" });
         }
         res.json(data);
-        p.remove();
+        // p.remove();
       });
     } catch (e) {
       console.log(e);
@@ -276,7 +276,7 @@ router.post("/find-one-update", function (req, res, next) {
 
 const removeOne = require("./myApp.js").removeById;
 router.post("/remove-one-person", function (req, res, next) {
-  Person.remove({}, function (err) {
+  Person.deleteMany({}, function (err) {
     if (err) {
       return next(err);
     }
@@ -319,7 +319,7 @@ router.post("/remove-one-person", function (req, res, next) {
 
 const removeMany = require("./myApp.js").removeManyPeople;
 router.post("/remove-many-people", function (req, res, next) {
-  Person.remove({}, function (err) {
+  Person.deleteMany({}, function (err) {
     if (err) {
       return next(err);
     }
@@ -340,23 +340,31 @@ router.post("/remove-many-people", function (req, res, next) {
             console.log("Missing `done()` argument");
             return next({ message: "Missing callback argument" });
           }
+          // console.log(data);
+          // res.json({
+            // n: data.n,
+            // count: data.deletedCount,
+            // ok: data.ok,
+          // });
+          // return next({message: "Success"});
           Person.count(function (err, cnt) {
             if (err) {
               return next(err);
             }
-            if (data.ok === undefined) {
-              // for mongoose v4
-              try {
-                data = JSON.parse(data);
-              } catch (e) {
-                console.log(e);
-                return next(e);
-              }
-            }
+            // if (data.ok === undefined) {
+            //   // for mongoose v4
+            //   try {
+            //     data = JSON.parse(data);
+            //   } catch (e) {
+            //     console.log(e);
+            //     return next(e);
+            //   }
+            // }
+            console.log(cnt);
             res.json({
-              n: data.n,
+              n: data.deletedCount,
               count: cnt,
-              ok: data.ok,
+              ok: true,
             });
           });
         });
@@ -373,7 +381,7 @@ router.post("/query-tools", function (req, res, next) {
   let t = setTimeout(() => {
     next({ message: "timeout" });
   }, TIMEOUT);
-  Person.remove({}, function (err) {
+  Person.deleteMany({}, function (err) {
     if (err) {
       return next(err);
     }
