@@ -1,5 +1,15 @@
-require('dotenv').config();
+//require('dotenv').config();
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
 
+console.log(process.env.MONGO_URI);
+
+try{
+  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+} catch (err) {
+  console.log('Cannot connect to DB', err);
+}
 
 let Person;
 
