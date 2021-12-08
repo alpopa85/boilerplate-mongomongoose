@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 
+const { Schema } = mongoose;
+
 console.log(process.env.MONGO_URI);
 
 try{
@@ -11,14 +13,57 @@ try{
   console.log('Cannot connect to DB', err);
 }
 
-let Person;
+const personSchema = new Schema({
+  name:  String,
+  age: Number,
+  favoriteFoods: [ String ]
+});
+
+let Person = mongoose.model('Person', personSchema);
 
 const createAndSavePerson = (done) => {
-  done(null /*, data*/);
+  let document = new Person({
+    name:  "Joe Biden",
+    age: 76,
+    favoriteFoods: [ "Burger", "Goulash" ]
+  });
+
+  document.save((err, data) => {
+    if (err) {
+      console.log('Error!', err);
+    } else {
+      console.log('Object created');
+      done(null, data);
+    }
+  });     
 };
 
+var arrayOfPeople = [
+  {
+    name:  "Joe Biden",
+    age: 76,
+    favoriteFoods: [ "Burger", "Goulash" ]
+  },
+  {
+    name:  "Hillary Clinton",
+    age: 66,
+    favoriteFoods: [ "Burger", "Saghetti" ]
+  },
+  {
+    name:  "Kamala Harris",
+    age: 56,
+    favoriteFoods: [ "Burger", "KFC" ]
+  }
+];
 const createManyPeople = (arrayOfPeople, done) => {
-  done(null /*, data*/);
+    let people = Person.create(arrayOfPeople, (err, data) => {
+      if (err) {
+      console.log('Error!', err);
+    } else {
+      console.log('Multiple objects created');
+      done(null, data);
+    }
+    });  
 };
 
 const findPeopleByName = (personName, done) => {
